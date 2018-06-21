@@ -8,7 +8,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"zanini.me/zfsmon/clif"
+	"github.com/zaninime/zfsmon/clif"
 )
 
 var (
