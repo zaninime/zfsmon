@@ -1,12 +1,19 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"zanini.me/zfsmon/clif"
+)
+
+var (
+	listenHost = flag.String("host", "", "Listen host, leave empty for all interfaces")
+	listenPort = flag.Int("port", 8080, "Listen port")
 )
 
 type zpoolMetrics struct {
@@ -52,10 +59,14 @@ func (zm *zpoolMetrics) Collect(ch chan<- prometheus.Metric) {
 }
 
 func main() {
+	flag.Parse()
+
 	cmd := clif.NewDefaultZpoolCommand()
 	prometheus.MustRegister(newZpoolMetrics(cmd))
 
 	http.Handle("/metrics", promhttp.Handler())
-	log.Println("Beginning to serve on port :8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+
+	listenAddr := fmt.Sprintf("%s:%d", *listenHost, *listenPort)
+	log.Printf("Beginning to serve on %s\n", listenAddr)
+	log.Fatal(http.ListenAndServe(listenAddr, nil))
 }
